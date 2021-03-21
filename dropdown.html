@@ -1,40 +1,67 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <link href="dropdown.css" rel="stylesheet" type="text/css">
-    <link href="notyf.min.css" rel="stylesheet" type="text/css">
-</head>
-<body>
-    <div id="body">
-        <div id="setup">
-            <h1>BoilerKey - Chrome Setup Instructions</h1>
-            <p>
-            1. First, add a new BoilerKey by clicking on the following link (<a  target="_blank" href="https://purdue.edu/boilerkey">https://purdue.edu/boilerkey</a>).
-            </p>
-            <p>
-            2. Follow the setup instructions for the new key. Once you reach the QR code page, copy the duo security link and paste it below.
-            </p>
-            <p>
-            </p>
 
-            <form>
-                <div class="input-form">
-                    <input class="input-field" type="text" placeholder="Enter duo url here" name="duo-url" id="duo-url"/>
-                    <button class="submit-field" id="submit" type="submit">Add Url</button>
-                </div>
-            </form>
-        </div>
-        <div id="request">
-            <h1>Request Code</h1>
-            <p>Click the request button below to request your code. Once you receive your code, login by putting <strong class="codez"> pin,code</strong> in the password field!</p>
-            <p id="code"></p>
-            <button class="request-button" id="request-button" type="submit">Request code</button>
-            <button id="clear-data">Clear Data</button>
-        </div>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <link href="dropdown.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+  <div id="options" style="display:none;">
+    <h1>Options</h1>
+    <input type="radio" id="auto-login" name="mode" value="auto-login" checked>
+    <label for="auto-login">Auto Login</label><br>
+    <input type="radio" id="manual-login" name="mode" value="manual-login">
+    <label for="manual-login">Manual Login</label><br><br>
+    <button id="clear-data">Clear Data</button>
+    <button class="options-button" id="options-close">Back</button>
+  </div>
+  <div id="body">
+    <div id="loading">
+      <div class="loader"></div>
     </div>
+    <div id="setup">
+      <h1>Setup</h1>
+      <div id="login-setup-div">
+        <p>
+          1. First, log in to your purdue account (<a target="_blank" href="https://www.purdue.edu/apps/account/cas/login">https://www.purdue.edu/apps/account/cas/login</a>).
+        </p>
+        <button class="request-button" id="check-status" type="submit">Check Status</button>
+      </div>
+      <div id="input-div">
+        <p>
+          2. Input your username and pin to allow login
+        </p>
+
+        <form>
+          <div class="input-form">
+            <small>Username</small><br>
+            <input class="input-field" type="text" placeholder="Username" name="username" id="username" /><br>
+            <small>BoilerKey Pin</small><br>
+            <input class="input-field" type="text" placeholder="****" name="pin" id="pin" /><br>
+            <small>New BoilerKey Device Name</small><br>
+            <input class="input-field" type="text" placeholder="Name" name="name" id="name" value="BoilerKey_Chrome"/><br><br>
+            <button class="submit-field" id="submit" type="submit" disabled>Generate BoilerKey</button>
+          </div>
+        </form>
+    </div>
+  </div>
+    <div id="login">
+      <h1>Login</h1>
+      <p>Click the login button below to automatically login to your Purdue account! Once you log in, refresh purdue sites</p>
+      <button class="request-button" id="login-button" type="submit">Login</button>
+    </div>
+    <br>
+    <div id="progress-div">
+      <div class="progress" id="generate-progress">
+        <div class="progress-bar" id="generate-progress-bar"></div>
+      </div>
+    </div>
+    <button class="options-button" id="options-open">Options</button>
+  </div>
 </body>
-<script src="hotp.js"></script>
-<script src="dropdown.js"></script>
-<script src="notyf.min.js"></script>
+<script src="js/hotp.js"></script>
+<script src="js/boilerkey.js"></script>
+<script src="js/dropdown.js"></script>
+
 </html>
