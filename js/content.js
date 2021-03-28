@@ -34,6 +34,10 @@ if (location.href.indexOf("https://www.purdue.edu/apps/account/cas/login") == 0)
   // prevent chrome from trying to save password
   document.getElementsByClassName("password")[0].insertAdjacentHTML("afterbegin", '<input type="password" style="display:none"/>');
 
+  submit.addEventListener('click', (e) => {
+    node.setAttribute("disabled", "disabled");
+  })
+
   node = document.createElement("button");
   node.className = "submit-button";
   node.innerHTML = "Auto Login";

@@ -1,6 +1,6 @@
 {
   "name": "BoilerKey Auto Login - Chrome",
-  "version": "0.0.0.3",
+  "version": "0.0.1.0",
   "permissions": [
     "storage",
     "cookies",
