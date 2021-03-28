@@ -1,0 +1,39 @@
+.submit-button {
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  background: #fbc531;
+  border: none;
+  border-radius: 2px;
+  color: #000000;
+  /*height: 42.5px;*/
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.submit-button:hover {
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  background: #edba2f;
+  border: none;
+  border-radius: 2px;
+  color: #000000;
+  /*height: 42.5px;*/
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.submit-button:disabled,
+submit-button[disabled] {
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  background: #787878;
+  border: none;
+  border-radius: 2px;
+  color: #000000;
+  /*height: 42.5px;*/
+  white-space: nowrap;
+  overflow: hidden;
+}

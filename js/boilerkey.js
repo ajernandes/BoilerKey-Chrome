@@ -1,30 +1,52 @@
 class BoilerKey {
 
-  static requestPassword() {
-    const secret = localStorage.getItem("key-hotp");
+  // returns dict of {username, password}
+  static getLoginDetails(cb) {
+    chrome.storage.local.get(['keyHotp', 'username', 'pin'], function(result) {
+      if ('keyHotp' in result) {
+        BoilerKey.incrementCounter((count) => {
+          let hotp = new jsOTP.hotp();
+          let pass = hotp.getOtp(result.keyHotp, count);
+          cb({username: result.username, password: result.pin+","+pass});
+        });
+      }
+      else {
+        console.error("Error: No HOTP");
+        cb(null);
+      }
+    });
+  }
 
-    if(!secret) {
-      console.log("Error: No HOTP");
-      return;
-    }
-
-    let count = localStorage.getItem("key-counter");
-
-    if(count) {
-      count = parseInt(count) + 1;
-    } else {
-      count = 1;
-    }
-
-    localStorage.setItem("key-counter", count);
-
-    let hotp = new jsOTP.hotp();
-    return hotp.getOtp(secret, count);
+  static requestPassword(cb) {
+    chrome.storage.local.get(['keyHotp'], function(result) {
+      if ('keyHotp' in result) {
+        BoilerKey.incrementCounter((count) => {
+          let hotp = new jsOTP.hotp();
+          let pass = hotp.getOtp(result.keyHotp, count);
+          cb(pass);
+        });
+      }
+      else {
+        console.error("Error: No HOTP");
+        return;
+      }
+    });
   }
 
   static login(cb) {
     if (BoilerKey.hasData()) {
-      BoilerKey.addAuthentication(localStorage.getItem("username"), localStorage.getItem("pin")+","+BoilerKey.requestPassword(), cb);
+      BoilerKey.getLoginDetails((det) => {
+        if (det) {
+          BoilerKey.addAuthentication(det.username, det.password, cb);
+        }
+      })
+      // BoilerKey.requestPassword((pass) => {
+      //   chrome.storage.local.get(['username', 'pin'], function(result) {
+      //     let username = result.username;
+      //     let pin = result.pin;
+      //
+      //   });
+      // });
     }
     else {
       cb(false);
@@ -32,52 +54,23 @@ class BoilerKey {
   }
 
   static genBoilerKey(name, cb, cbStatus) {
-    let username = localStorage.getItem("username");
-    let pin = localStorage.getItem("pin");
-
-    if ((username === null) || (pin === null)) {
-      cb(null);
-    }
-
-    cbStatus(0,5);
-
-    let headers = {
-      "User-Agent": "okhttp/3.11.0"
-    }
-
-    fetch("https://www.purdue.edu/apps/account/flows/BoilerKey", {
-      method: "GET",
-      headers: headers,
-    })
-    .then(res => res.text())
-    .then(res => {
-      // find execution flow number
-      var sub_to_find = "/apps/account/flows/BoilerKey?execution=";
-      var start_ind = res.indexOf(sub_to_find);
-      if (start_ind == -1) {
-        // execution flow number not found?!
-        throw "execution flow number not found";
+    chrome.storage.local.get(['username', 'pin'], function(result) {
+      if (!('username' in result) && !('pin' in result)) {
+        cb(null);
       }
-      else {
-        start_ind += sub_to_find.length;
+
+      let username = result.username;
+      let pin = result.pin;
+
+      cbStatus(0,5);
+
+      let headers = {
+        "User-Agent": "okhttp/3.11.0"
       }
-      var flow_str = res.substring(start_ind, res.indexOf('"', start_ind));
 
-      cbStatus(1,5);
-
-      let new_post_data = {
-          "_eventId": "boilerKeyDuoMobileCreate",
-          "_flowExecutionKey": flow_str,
-          "phoneName": null,
-          "execution": flow_str,
-      }
-      var urlParams = new URLSearchParams(Object.entries(new_post_data));
-
-      // send post to login
       fetch("https://www.purdue.edu/apps/account/flows/BoilerKey", {
-        method: "POST",
+        method: "GET",
         headers: headers,
-        body: urlParams,
       })
       .then(res => res.text())
       .then(res => {
@@ -93,15 +86,17 @@ class BoilerKey {
         }
         var flow_str = res.substring(start_ind, res.indexOf('"', start_ind));
 
-        cbStatus(2,5);
+        cbStatus(1,5);
 
-        let cont_post_data = {
-                "_eventId": "duoMobileCreateProcessDownloadAppAction",
-                "_flowExecutionKey": flow_str,
-                "execution": flow_str,
+        let new_post_data = {
+            "_eventId": "boilerKeyDuoMobileCreate",
+            "_flowExecutionKey": flow_str,
+            "phoneName": null,
+            "execution": flow_str,
         }
-        urlParams = new URLSearchParams(Object.entries(cont_post_data));
+        var urlParams = new URLSearchParams(Object.entries(new_post_data));
 
+        // send post to login
         fetch("https://www.purdue.edu/apps/account/flows/BoilerKey", {
           method: "POST",
           headers: headers,
@@ -121,15 +116,14 @@ class BoilerKey {
           }
           var flow_str = res.substring(start_ind, res.indexOf('"', start_ind));
 
-          cbStatus(3,5);
+          cbStatus(2,5);
 
-          let pin_post_data = {
-                  "_eventId": "duoMobileCreateProcessSetPinAction",
+          let cont_post_data = {
+                  "_eventId": "duoMobileCreateProcessDownloadAppAction",
                   "_flowExecutionKey": flow_str,
                   "execution": flow_str,
-                  "existingPin": pin,
           }
-          urlParams = new URLSearchParams(Object.entries(pin_post_data));
+          urlParams = new URLSearchParams(Object.entries(cont_post_data));
 
           fetch("https://www.purdue.edu/apps/account/flows/BoilerKey", {
             method: "POST",
@@ -150,15 +144,15 @@ class BoilerKey {
             }
             var flow_str = res.substring(start_ind, res.indexOf('"', start_ind));
 
-            cbStatus(4,5);
+            cbStatus(3,5);
 
-            let name_post_data = {
-                    "_eventId": "duoMobileCreateProcessNameDeviceAction",
+            let pin_post_data = {
+                    "_eventId": "duoMobileCreateProcessSetPinAction",
                     "_flowExecutionKey": flow_str,
                     "execution": flow_str,
-                    "phoneName": name,
+                    "existingPin": pin,
             }
-            urlParams = new URLSearchParams(Object.entries(name_post_data));
+            urlParams = new URLSearchParams(Object.entries(pin_post_data));
 
             fetch("https://www.purdue.edu/apps/account/flows/BoilerKey", {
               method: "POST",
@@ -167,28 +161,63 @@ class BoilerKey {
             })
             .then(res => res.text())
             .then(res => {
-              // find duo url
-              sub_to_find = 'https://m-1b9bef70.duosecurity.com/activate/';
-              start_ind = res.indexOf(sub_to_find);
+              // find execution flow number
+              var sub_to_find = "/apps/account/flows/BoilerKey?execution=";
+              var start_ind = res.indexOf(sub_to_find);
               if (start_ind == -1) {
-                // duo url not found?!
-                throw "duo url not found";
+                // execution flow number not found?!
+                throw "execution flow number not found";
               }
+              else {
+                start_ind += sub_to_find.length;
+              }
+              var flow_str = res.substring(start_ind, res.indexOf('"', start_ind));
 
-              cbStatus(5,5);
+              cbStatus(4,5);
 
-              let duo_url = res.substring(start_ind, res.indexOf('"', start_ind));
-              cb(duo_url);
+              let name_post_data = {
+                      "_eventId": "duoMobileCreateProcessNameDeviceAction",
+                      "_flowExecutionKey": flow_str,
+                      "execution": flow_str,
+                      "phoneName": name,
+              }
+              urlParams = new URLSearchParams(Object.entries(name_post_data));
+
+              fetch("https://www.purdue.edu/apps/account/flows/BoilerKey", {
+                method: "POST",
+                headers: headers,
+                body: urlParams,
+              })
+              .then(res => res.text())
+              .then(res => {
+                // find duo url
+                sub_to_find = 'https://m-1b9bef70.duosecurity.com/activate/';
+                start_ind = res.indexOf(sub_to_find);
+                if (start_ind == -1) {
+                  // duo url not found?!
+                  throw "duo url not found";
+                }
+
+                cbStatus(5,5);
+
+                let duo_url = res.substring(start_ind, res.indexOf('"', start_ind));
+                cb(duo_url);
+              })
+              .catch(error => {
+                console.log(error);
+                alert("Invalid device name! You already have a BoilerKey device with this name!")
+                cb(null);
+              })
             })
             .catch(error => {
               console.log(error);
-              alert("Invalid device name! You already have a BoilerKey device with this name!")
+              alert("Invalid pin! Please check that you enter the correct PIN.")
               cb(null);
             })
           })
           .catch(error => {
             console.log(error);
-            alert("Invalid pin! Please check that you enter the correct PIN.")
+            alert("There was an error. Please try again later.")
             cb(null);
           })
         })
@@ -203,12 +232,7 @@ class BoilerKey {
         alert("There was an error. Please try again later.")
         cb(null);
       })
-    })
-    .catch(error => {
-      console.log(error);
-      alert("There was an error. Please try again later.")
-      cb(null);
-    })
+    });
   }
 
   static addAuthentication(username, password, cb) {
@@ -348,9 +372,11 @@ class BoilerKey {
     .then(res => res.json())
     .then(res => {
       const hotpSecret = res["response"]["hotp_secret"];
-      localStorage.setItem("key-hotp", hotpSecret);
-      localStorage.setItem("key-counter", 1);
-      cb(true);
+      chrome.storage.local.set({keyHotp: hotpSecret, hotpCounter: 1}, function() {
+        cb(true);
+      });
+      // localStorage.setItem("keyHotp", hotpSecret);
+      // localStorage.setItem("hotpCounter", 1);
     })
     .catch(error => {
       console.log(error);
@@ -380,31 +406,57 @@ class BoilerKey {
     }
   }
 
-  static hasData() {
-    if ((localStorage.getItem("key-hotp") === null) ||
-        (localStorage.getItem("key-counter") === null) ||
-        (localStorage.getItem("username") === null) ||
-        (localStorage.getItem("pin") === null)) {
-      return false;
-    }
-    return true;
+  static hasData(cb) {
+    chrome.storage.local.get(['keyHotp', 'hotpCounter', 'username', 'pin'], function(result) {
+      if (("keyHotp" in result) &&
+          ("hotpCounter" in result) &&
+          ("username" in result) &&
+          ("pin" in result)) {
+        cb(true);
+      }
+      else {
+        cb(false);
+      }
+    });
+    // if ((localStorage.getItem("keyHotp") === null) ||
+    //     (localStorage.getItem("hotpCounter") === null) ||
+    //     (localStorage.getItem("username") === null) ||
+    //     (localStorage.getItem("pin") === null)) {
+    //   return false;
+    // }
+    // return true;
   }
 
-  static clearData() {
-    localStorage.removeItem("key-hotp");
-    localStorage.removeItem("key-counter");
-    localStorage.removeItem("username");
-    localStorage.removeItem("pin");
+  static clearData(cb) {
+    chrome.storage.local.clear(cb);
+    // localStorage.removeItem("keyHotp");
+    // localStorage.removeItem("hotpCounter");
+    // localStorage.removeItem("username");
+    // localStorage.removeItem("pin");
   }
 
-  static incrementCounter() {
-    let count = localStorage.getItem("key-counter");
-
-    if(count) {
-      localStorage.setItem("key-counter", count + 1);
-      return count + 1;
-    } else {
-      return null;
-    }
+  static incrementCounter(cb) {
+    chrome.storage.local.get(['hotpCounter'], function(result) {
+      var count;
+      if ('hotpCounter' in result) {
+        count = parseInt(result.hotpCounter) + 1;
+      }
+      else {
+        count = 1;
+      }
+      chrome.storage.local.set({hotpCounter: count+1}, function() {
+        if (cb) {
+          cb(count);
+        }
+      });
+    });
+    // let count = localStorage.getItem("hotpCounter");
+    //
+    // if(count) {
+    //   localStorage.setItem("hotpCounter", count + 1);
+    //   return count + 1;
+    // } else {
+    //   return null;
+    // }
   }
 }

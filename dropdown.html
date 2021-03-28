@@ -7,28 +7,30 @@
 </head>
 
 <body>
-  <div id="options" style="display:none;">
+  <div id="loading">
+    <div class="loader"></div>
+  </div>
+  <!-- <div id="options" style="display:none;">
     <h1>Options</h1>
-    <input type="radio" id="auto-login" name="mode" value="auto-login" checked>
-    <label for="auto-login">Auto Login</label><br>
-    <input type="radio" id="manual-login" name="mode" value="manual-login">
-    <label for="manual-login">Manual Login</label><br><br>
+    <label>Auto Login</label>
+    <label class="switch">
+      <input type="checkbox">
+      <span class="slider round"></span>
+    </label><br>
     <button id="clear-data">Clear Data</button>
     <button class="options-button" id="options-close">Back</button>
+   -->
   </div>
   <div id="body">
-    <div id="loading">
-      <div class="loader"></div>
-    </div>
     <div id="setup" style="display:none;">
       <h1>Setup</h1>
-      <div id="login-setup-div">
+      <div id="setup-login-div">
         <p>
           1. First, log in to your purdue account (<a target="_blank" href="https://www.purdue.edu/apps/account/cas/login?service=https%3A%2F%2Fwl.mypurdue.purdue.edu">https://www.purdue.edu/apps/account/cas/login</a>).
         </p>
-        <button class="request-button" id="check-status" type="submit">Check Status</button>
+        <button class="request-button" id="check-login-status" type="submit">Check Status</button>
       </div>
-      <div id="input-div">
+      <div id="setup-input-div">
         <p>
           2. Input your username and pin to allow login
         </p>
@@ -40,24 +42,25 @@
             <small>BoilerKey Pin</small><br>
             <input class="input-field" type="text" placeholder="****" name="pin" id="pin" /><br>
             <small>New BoilerKey Device Name</small><br>
-            <input class="input-field" type="text" placeholder="Name" name="name" id="name" value="BoilerKey_Chrome"/><br><br>
+            <input class="input-field" type="text" placeholder="Name" name="name" id="device-name" value="BoilerKey_Chrome" /><br><br>
             <button class="submit-field" id="submit" type="submit" disabled>Generate BoilerKey</button>
           </div>
         </form>
-    </div>
-  </div>
-    <div id="login" style="display:none;">
-      <h1>Login</h1>
-      <p>Click the login button below to automatically login to your Purdue account! Once you log in, refresh purdue sites</p>
-      <button class="request-button" id="login-button" type="submit">Login</button>
-    </div>
-    <br>
-    <div id="progress-div" style="display:none;">
-      <div class="progress" id="generate-progress">
-        <div class="progress-bar" id="generate-progress-bar"></div>
       </div>
     </div>
-    <button class="options-button" id="options-open">Options</button>
+    <div id="login" style="display:none;">
+      <h1>BoilerKey</h1>
+           <label  style="word-wrap:break-word">
+              <input id="auto-login-toggle"  type="checkbox" style="vertical-align:middle;"/> Auto Login</label>
+      <br><br>
+      <!-- TODO: insert status here! -->
+      <button id="clear-data">Clear Data</button>
+    </div>
+    <br>
+    <div id="progress-div" class="progress" style="display:none;">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <!-- <button class="options-button" id="options-open">Options</button> -->
   </div>
 </body>
 <script src="js/hotp.js"></script>

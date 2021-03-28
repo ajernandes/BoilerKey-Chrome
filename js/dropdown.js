@@ -1,12 +1,165 @@
+// var optionsDiv;
+var clear;
+var autoLoginToggle;
+// var backBtn;
+var bodyDiv;
+var loadingDiv;
+var setupDiv;
+var setupLoginDiv;
+var checkStatusBtn;
+var setupInputDiv;
+var username;
+var pin;
+var deviceName;
+var submit;
+var loginDiv;
+var progressDiv;
+var progressBar;
+// var optionsBtn;
+
+function init() {
+  clear.addEventListener("click", (e) => {
+    let confirmed = confirm("Are you sure you want to go through the entire setup process again?")
+
+    if (confirmed) {
+      BoilerKey.clearData();
+      BoilerKey.updateLoginStatus((loggedIn) => {
+        showDropDown(loggedIn);
+      })
+    }
+  })
+
+  autoLoginToggle.addEventListener("change", (e) => {
+    if (autoLoginToggle.checked) {
+      chrome.storage.local.set({autoLogin: 1}, function() {
+      });
+    }
+    else {
+      chrome.storage.local.set({autoLogin: 0}, function() {
+      });
+    }
+  })
+
+  // optionsBtn.addEventListener("click", (e) => {
+  //   hide(bodyDiv);
+  //   show(optionsDiv);
+  // })
+  // backBtn.addEventListener("click", (e) => {
+  //   show(bodyDiv);
+  //   hide(optionsDiv);
+  // })
+
+
+  checkStatusBtn.addEventListener("click", (e) => {
+    BoilerKey.updateLoginStatus((loggedIn) => {
+      showDropDown(loggedIn);
+    })
+  })
+
+  submit.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (!submit.hasAttribute('disabled')) {
+      let confirmed = confirm("Confirm: A new BoilerKey device will be created and you will get an email");
+      if (confirmed) {
+        chrome.storage.local.set({username: username.value, pin: pin.value}, function() {
+
+          // localStorage.setItem("username", username.value);
+          // localStorage.setItem("pin", pin.value);
+
+          console.log("getting url");
+          disableForm();
+          show(progressDiv);
+
+          let url = BoilerKey.genBoilerKey(deviceName.value, (url) => {
+            if (url) {
+              BoilerKey.addUrl(url, (used) => {
+                BoilerKey.updateLoginStatus((loggedIn) => {
+                  showDropDown(loggedIn);
+                });
+                if (!used) {
+                  alert("There was an error. Please try again later.")
+                  enableForm();
+                }
+              });
+            } else {
+              BoilerKey.updateLoginStatus((loggedIn) => {
+                showDropDown(loggedIn);
+              });
+              enableForm();
+            }
+          }, (curr, tot) => {
+            moveProgressBar(progressBar, curr, tot);
+          });
+        });
+      }
+    }
+    e.preventDefault();
+  })
+
+  function checkForm(e) {
+    if ((username.value.length != 0) && ((pin.value.length == 4) || (pin.value.length == 6)) && (!isNaN(pin.value))) {
+      regex = /^[A-Za-z0-9_]+$/;
+      let str = deviceName.value;
+      if ((str.length < 32) && (str.length > 0) && (regex.test(str))) {
+        BoilerKey.updateLoginStatus((loggedIn) => {
+          if (loggedIn) {
+            submit.removeAttribute("disabled");
+          } else {
+            submit.setAttribute("disabled", "disabled");
+          }
+        });
+      } else {
+        alert("Device name can only include numbers, letters, and underscores");
+      }
+    } else {
+      submit.setAttribute("disabled", "disabled");
+    }
+  }
+
+  username.addEventListener("input", checkForm);
+  pin.addEventListener("input", checkForm);
+  deviceName.addEventListener("input", checkForm);
+}
+
+function disableForm() {
+  username.setAttribute("disabled", "disabled");
+  pin.setAttribute("disabled", "disabled");
+  deviceName.setAttribute("disabled", "disabled");
+  hide(submit);
+}
+
+function enableForm() {
+  username.removeAttribute("disabled");
+  pin.removeAttribute("disabled");
+  deviceName.removeAttribute("disabled");
+  show(submit);
+}
+
+// ret true/false for whether autologin is enabled
+function isAuto(cb) {
+  chrome.storage.local.get(['autoLogin'], function(result) {
+    if (!('autoLogin' in result)) {
+      chrome.storage.local.set({autoLogin: 0}, function() {
+        cb(false);
+      });
+    }
+    else if (result.autoLogin == 0) {
+      cb(false);
+    }
+    else {
+      cb(true);
+    }
+  });
+}
 
 function moveProgressBar(elem, num, tot) {
-  let targetWid = (100*num/tot).toFixed(2);
+  let targetWid = (100 * num / tot).toFixed(2);
   var currWid = Number(elem.style.width.replace(/[^\d\.\-]/g, ''));
   if (targetWid < currWid) {
     elem.style.width = targetWid + "%";
-  }
-  else {
+  } else {
     var id = setInterval(frame, 10);
+
     function frame() {
       if (currWid >= targetWid) {
         clearInterval(id);
@@ -18,217 +171,78 @@ function moveProgressBar(elem, num, tot) {
   }
 }
 
-function validate(usernameEl, pinEl, nameEl) {
-  if ((usernameEl.value.length != 0) && ((pinEl.value.length == 4) || (pinEl.value.length == 6)) && (!isNaN(pinEl.value))) {
-    regex = /^[A-Za-z0-9_]+$/;
-    let str = nameEl.value;
-    if ((nameEl.value.length < 32) && (nameEl.value.length > 0) && (regex.test(str))) {
-      return true;
-    }
-    else {
-      alert("Name can only include numbers, letters, and underscores");
-    }
-  }
-  return false;
+function hide(el) {
+  el.style.display = "none";
+}
+function show(el) {
+  el.style.display = "block";
 }
 
-function onInit() {
-  let optionsDiv = document.getElementById("options");
-  let bodyDiv = document.getElementById("body");
-  let inputDiv = document.getElementById("input-div");
-  let loginSetupDiv = document.getElementById("login-setup-div");
-  let progressDiv = document.getElementById("progress-div");
-  let progressBar = document.getElementById("generate-progress-bar");
-  let submit = document.getElementById("submit");
-  let checkStatusBtn = document.getElementById("check-status");
-  let login = document.getElementById("login-button");
-  let clear = document.getElementById("clear-data");
-  let username = document.getElementById("username");
-  let pin = document.getElementById("pin");
-  let name = document.getElementById("name");
+function showDropDown(loggedIn) {
+  show(loadingDiv);
+  // hide(optionsDiv);
+  hide(bodyDiv);
+  BoilerKey.hasData((status) => {
+    if (!status) {
+      console.log("not set up");
+      hide(loadingDiv);
+      show(bodyDiv);
+      hide(loginDiv);
+      hide(progressDiv);
 
-  if (BoilerKey.hasData()) {
-    username.value = localStorage.getItem("username");
-    pin.value = localStorage.getItem("pin");
-  }
+      show(setupDiv);
 
-  let loadingDiv = document.getElementById("loading");
-  let setupDiv = document.getElementById("setup");
-  let loginDiv = document.getElementById("login");
-
-  function showDropDown(loggedIn) {
-    loadingDiv.style.display = "block";
-    if (!BoilerKey.hasData()) {
-      loginDiv.style.display = "none";
-      progressDiv.style.display = "none";
-      BoilerKey.clearData();
-      console.log("doesnt hotp");
       if (loggedIn) {
-        loadingDiv.style.display = "none";
-        setupDiv.style.display = "block";
-        inputDiv.style.display = "block";
-        loginSetupDiv.style.display = "none";
-      }
-      else {
-        BoilerKey.clearCookies(() => {
-          loadingDiv.style.display = "none";
-          setupDiv.style.display = "block";
-          inputDiv.style.display = "none";
-          loginSetupDiv.style.display = "block";
-        });
-      }
-    } else {
-      loadingDiv.style.display = "none";
-      setupDiv.style.display = "none";
-      progressDiv.style.display = "none";
-      loginDiv.style.display = "block";
-      console.log("has have");
-      login.textContent = "Login";
-      if (loggedIn) {
-        // TODO: Add more info here and prevent logging in again
-        login.textContent = "Already logged in";
-        login.setAttribute("disabled", "disabled");
-      }
-      else {
-        login.textContent = "Login";
-        login.removeAttribute("disabled");
+        hide(setupLoginDiv);
+        show(setupInputDiv);
+        enableForm();
+      } else {
+        show(setupLoginDiv);
+        hide(setupInputDiv);
+        disableForm();
       }
     }
-  }
-
-  // TODO: Add form handling listeners
-
-  submit.addEventListener("click", (e) => {
-    e.preventDefault();
-    if (!submit.hasAttribute('disabled')) {
-      let confirmed = confirm("Confirm: A new BoilerKey device will be created and you will get an email");
-      if (confirmed) {
-        localStorage.setItem("username", username.value);
-        localStorage.setItem("pin", pin.value);
-
-        // TODO: Add loading indicator
-        // TODO: username/pin error support
-        // TODO: device name error handling
-
-        console.log("getting url");
-        progressDiv.style.display = "block";
-        // progressBar.style.width = "0%";
-        submit.style.display = "none";
-        let url = BoilerKey.genBoilerKey(name.value, (url) => {
-          if (url) {
-            BoilerKey.addUrl(url, (used) => {
-              BoilerKey.updateLoginStatus((loggedIn) => {
-                showDropDown(loggedIn);
-              });
-              if (!used) {
-                alert("There was an error. Please try again later.")
-                submit.style.display = "block";
-              }
-            });
-          }
-          else {
-            BoilerKey.updateLoginStatus((loggedIn) => {
-              showDropDown(loggedIn);
-            });
-            submit.style.display = "block";
-          }
-        }, (curr, tot) => {
-          moveProgressBar(progressBar, curr, tot);
-        });
-      }
-    }
-    e.preventDefault();
-  })
-
-  login.addEventListener("click", (e) => {
-    if (!login.hasAttribute('disabled')) {
-      BoilerKey.login((status) => {
-        showDropDown(status);
+    else {
+      console.log("set up");
+      isAuto((stat) => {
+        autoLoginToggle.checked = stat;
       });
+
+      hide(loadingDiv);
+      show(bodyDiv);
+      hide(setupDiv);
+      hide(progressDiv);
+
+      show(loginDiv);
+
+      // TODO: Add status indicator here
     }
-  })
+  });
+}
 
-  clear.addEventListener("click", (e) => {
-    let confirmed = confirm("Are you sure you want to go through the entire setup process again?")
+document.addEventListener('DOMContentLoaded', () => {
+  // optionsDiv = document.getElementById("options");
+  clear = document.getElementById("clear-data");
+  autoLoginToggle = document.getElementById("auto-login-toggle");
+  // backBtn = document.getElementById("options-close");
+  bodyDiv = document.getElementById("body");
+  loadingDiv = document.getElementById("loading");
+  setupDiv = document.getElementById("setup");
+  setupLoginDiv = document.getElementById("setup-login-div");
+  checkStatusBtn = document.getElementById("check-login-status");
+  setupInputDiv = document.getElementById("setup-input-div");
+  username = document.getElementById("username");
+  pin = document.getElementById("pin");
+  deviceName = document.getElementById("device-name");
+  submit = document.getElementById("submit");
+  loginDiv = document.getElementById("login");
+  progressDiv = document.getElementById("progress-div");
+  progressBar = document.getElementById("progress-bar");
+  // optionsBtn = document.getElementById("options-open");
 
-    if (confirmed) {
-      BoilerKey.clearData();
-      loginDiv.style.display = "none";
-      setupDiv.style.display = "block";
-      BoilerKey.updateLoginStatus((loggedIn) => {
-        showDropDown(loggedIn);
-      })
-    }
-  })
-
-  document.getElementById("options-open").addEventListener("click", (e) => {
-      bodyDiv.style.display = "none";
-      optionsDiv.style.display = "block";
-  })
-
-  document.getElementById("options-close").addEventListener("click", (e) => {
-      bodyDiv.style.display = "block";
-      optionsDiv.style.display = "none";
-  })
-
-  checkStatusBtn.addEventListener("click", (e) => {
-    BoilerKey.updateLoginStatus((loggedIn) => {
-      showDropDown(loggedIn);
-    })
-  })
-
-  username.addEventListener("input", (e) => {
-    if (validate(username, pin, name)) {
-      BoilerKey.updateLoginStatus((loggedIn) => {
-        if (loggedIn) {
-          submit.removeAttribute("disabled");
-        }
-        else {
-          submit.setAttribute("disabled", "disabled");
-        }
-      })
-    }
-    else {
-      submit.setAttribute("disabled", "disabled");
-    }
-  })
-
-  pin.addEventListener("input", (e) => {
-    if (validate(username, pin, name)) {
-      BoilerKey.updateLoginStatus((loggedIn) => {
-        if (loggedIn) {
-          submit.removeAttribute("disabled");
-        }
-        else {
-          submit.setAttribute("disabled", "disabled");
-        }
-      })
-    }
-    else {
-      submit.setAttribute("disabled", "disabled");
-    }
-  })
-
-  name.addEventListener("input", (e) => {
-    if (validate(username, pin, name)) {
-      BoilerKey.updateLoginStatus((loggedIn) => {
-        if (loggedIn) {
-          submit.removeAttribute("disabled");
-        }
-        else {
-          submit.setAttribute("disabled", "disabled");
-        }
-      })
-    }
-    else {
-      submit.setAttribute("disabled", "disabled");
-    }
-  })
-
+  init();
   // TODO: make option to log in when loading purdue login site
   BoilerKey.updateLoginStatus((loggedIn) => {
     showDropDown(loggedIn);
   })
-}
-
-document.addEventListener('DOMContentLoaded', onInit, false);
+}, false);
