@@ -59,19 +59,23 @@ function onInit() {
   function showDropDown(loggedIn) {
     loadingDiv.style.display = "block";
     if (!BoilerKey.hasData()) {
-      loadingDiv.style.display = "none";
       loginDiv.style.display = "none";
-      setupDiv.style.display = "block";
       progressDiv.style.display = "none";
       BoilerKey.clearData();
       console.log("doesnt hotp");
       if (loggedIn) {
+        loadingDiv.style.display = "none";
+        setupDiv.style.display = "block";
         inputDiv.style.display = "block";
         loginSetupDiv.style.display = "none";
       }
       else {
-        inputDiv.style.display = "none";
-        loginSetupDiv.style.display = "block";
+        BoilerKey.clearCookies(() => {
+          loadingDiv.style.display = "none";
+          setupDiv.style.display = "block";
+          inputDiv.style.display = "none";
+          loginSetupDiv.style.display = "block";
+        });
       }
     } else {
       loadingDiv.style.display = "none";
@@ -107,7 +111,6 @@ function onInit() {
         // TODO: device name error handling
 
         console.log("getting url");
-        console.log("name.value");
         progressDiv.style.display = "block";
         // progressBar.style.width = "0%";
         submit.style.display = "none";
@@ -140,12 +143,7 @@ function onInit() {
   login.addEventListener("click", (e) => {
     if (!login.hasAttribute('disabled')) {
       BoilerKey.login((status) => {
-        if (!status) {
-          alert("Error logging in");
-        }
-        else {
-          alert("Logged in");
-        }
+        showDropDown(status);
       });
     }
   })

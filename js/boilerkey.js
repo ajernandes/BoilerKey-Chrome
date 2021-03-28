@@ -212,77 +212,83 @@ class BoilerKey {
   }
 
   static addAuthentication(username, password, cb) {
+    let headers = {
+      "User-Agent": "okhttp/3.11.0"
+    }
     chrome.cookies.remove({ url: 'https://www.purdue.edu/apps/account/cas/login', name: 'JSESSIONID' },
       (cookie) => {
         if (!cookie) {
           console.log('Can\'t remove cookie!');
         }
-    });
-
-    let headers = {
-      "User-Agent": "okhttp/3.11.0"
-    }
-
-    fetch("https://www.purdue.edu/apps/account/cas/login", {
-      method: "GET",
-      headers: headers
-    })
-    .then(res => res.text())
-    .then(res => {
-      // find lt secret
-      var sub_to_find = '<input type="hidden" name="lt" value="';
-      var start_ind = res.indexOf(sub_to_find);
-      if (start_ind == -1) {
-        // lt secret not found?!
-        throw "lt secret not found";
-      }
-      else {
-         start_ind += sub_to_find.length;
-      }
-      let lt = res.substring(start_ind, res.indexOf('"', start_ind));
-
-      // find post url
-      sub_to_find = '<form id="fm1" action="';
-      start_ind = res.indexOf(sub_to_find);
-      if (start_ind == -1) {
-        // lt secret not found?!
-        throw "post form url not found";
-      }
-      else {
-         start_ind += sub_to_find.length;
-      }
-      let login_form_url = "https://www.purdue.edu" + res.substring(start_ind, res.indexOf('"', start_ind));
-
-      // generate login payload
-      let login_payload = {
-          'username': username,
-          'password': password,
-          'lt': lt,
-          'execution': 'e1s1',
-          '_eventId': 'submit',
-          'submit': 'Login'
-      }
-      let urlParams = new URLSearchParams(Object.entries(login_payload));
-      let uri = login_form_url + "?" + urlParams;
-
-      // send post to login
-      fetch(uri, {
-        method: "POST",
+      fetch("https://www.purdue.edu/apps/account/cas/login?service=https%3A%2F%2Fwl.mypurdue.purdue.edu", {
+        method: "GET",
         headers: headers
       })
-      // .then(res => res.text())
+      .then(res => res.text())
       .then(res => {
-        cb(true);
+        // find lt secret
+        var sub_to_find = '<input type="hidden" name="lt" value="';
+        var start_ind = res.indexOf(sub_to_find);
+        if (start_ind == -1) {
+          // lt secret not found?!
+          throw "lt secret not found";
+        }
+        else {
+           start_ind += sub_to_find.length;
+        }
+        let lt = res.substring(start_ind, res.indexOf('"', start_ind));
+
+        // find post url
+        sub_to_find = '<form id="fm1" action="';
+        start_ind = res.indexOf(sub_to_find);
+        if (start_ind == -1) {
+          // lt secret not found?!
+          throw "post form url not found";
+        }
+        else {
+           start_ind += sub_to_find.length;
+        }
+        let login_form_url = "https://www.purdue.edu" + res.substring(start_ind, res.indexOf('"', start_ind));
+
+        // generate login payload
+        let login_payload = {
+            'username': username,
+            'password': password,
+            'lt': lt,
+            'execution': 'e1s1',
+            '_eventId': 'submit',
+            'submit': 'Login'
+        }
+        let urlParams = new URLSearchParams(Object.entries(login_payload));
+        let uri = login_form_url + "&" + urlParams;
+
+        // send post to login
+        fetch(uri, {
+          method: "POST",
+          headers: headers,
+          redirect: "manual"
+        })
+        // .then(res => res.text())
+        .then(res => {
+          if (res.type == "opaqueredirect") {
+            console.log("logged in");
+            cb(true);
+          }
+          else {
+            console.log("not logged in");
+            cb(false);
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          cb(false);
+        })
       })
       .catch(error => {
         console.log(error);
         cb(false);
       })
-    })
-    .catch(error => {
-      console.log(error);
-      cb(false);
-    })
+    });
   }
 
   static updateLoginStatus(cb) {
@@ -290,7 +296,7 @@ class BoilerKey {
       "User-Agent": "okhttp/3.11.0"
     }
 
-    fetch("https://www.purdue.edu/apps/account/cas/login?service=https%3A%2F%2Fwl.mypurdue.purdue.edu%2Fc%2Fportal%2Flogin", {
+    fetch("https://www.purdue.edu/apps/account/cas/login?service=https%3A%2F%2Fwl.mypurdue.purdue.edu", {
       method: "GET",
       headers: headers,
       redirect: "manual",
@@ -350,6 +356,22 @@ class BoilerKey {
       console.log(error);
       cb(false);
     })
+  }
+
+  static clearCookies(cb) {
+    chrome.cookies.getAll({ domain: 'www.purdue.edu', session: true},
+      (cookieList) => {
+        var count = 0;
+        for (var i = 0; i < cookieList.length; i++) {
+            console.log("Removing: " + cookieList[i].name);
+            chrome.cookies.remove({name: cookieList[i].name, url: "https://" + cookieList[i].domain}, (cookie) => {
+              count++;
+              if (count == cookieList.length) {
+                cb();
+              }
+            });
+        }
+      });
   }
 
   static addUrl(url, cb) {

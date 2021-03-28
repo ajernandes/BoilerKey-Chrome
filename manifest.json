@@ -1,13 +1,13 @@
 {
-  "name": "BoilerKey - Chrome",
-  "version": "1.1",
+  "name": "BoilerKey Auto Login - Chrome",
+  "version": "0.0.0.2",
   "permissions": [
     "storage",
     "cookies",
     "https://api-1b9bef70.duosecurity.com/*",
     "https://www.purdue.edu/apps/account/cas/login"
   ],
-  "description": "A simple chrome extension that allows you to get your boilerkey passcode in browser",
+  "description": "Extension to automatically log in to your Purdue Acount",
   "manifest_version": 2,
   "browser_action": {
     "default_title": "BoilerKey - In Browser",

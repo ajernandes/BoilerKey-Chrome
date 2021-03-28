@@ -20,11 +20,11 @@
     <div id="loading">
       <div class="loader"></div>
     </div>
-    <div id="setup">
+    <div id="setup" style="display:none;">
       <h1>Setup</h1>
       <div id="login-setup-div">
         <p>
-          1. First, log in to your purdue account (<a target="_blank" href="https://www.purdue.edu/apps/account/cas/login">https://www.purdue.edu/apps/account/cas/login</a>).
+          1. First, log in to your purdue account (<a target="_blank" href="https://www.purdue.edu/apps/account/cas/login?service=https%3A%2F%2Fwl.mypurdue.purdue.edu">https://www.purdue.edu/apps/account/cas/login</a>).
         </p>
         <button class="request-button" id="check-status" type="submit">Check Status</button>
       </div>
@@ -46,13 +46,13 @@
         </form>
     </div>
   </div>
-    <div id="login">
+    <div id="login" style="display:none;">
       <h1>Login</h1>
       <p>Click the login button below to automatically login to your Purdue account! Once you log in, refresh purdue sites</p>
       <button class="request-button" id="login-button" type="submit">Login</button>
     </div>
     <br>
-    <div id="progress-div">
+    <div id="progress-div" style="display:none;">
       <div class="progress" id="generate-progress">
         <div class="progress-bar" id="generate-progress-bar"></div>
       </div>

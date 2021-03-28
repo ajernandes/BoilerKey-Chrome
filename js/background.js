@@ -9,6 +9,7 @@ chrome.tabs.onUpdated.addListener(function
       console.log(changeInfo.url);
       if (changeInfo.url.indexOf("https://www.purdue.edu/apps/account/cas/login") == 0) {
         BoilerKey.login((status) => {
+          console.log("Background login completed with status: " + status);
           if (status) {
           chrome.tabs.update(tabId, {url: changeInfo.url}, () => {
             if (chrome.runtime.lastError) {
