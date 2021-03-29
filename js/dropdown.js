@@ -34,12 +34,13 @@ function init() {
 
   autoLoginToggle.addEventListener("change", (e) => {
     if (autoLoginToggle.checked) {
-      chrome.storage.local.set({autoLogin: 1}, function() {
-      });
-    }
-    else {
-      chrome.storage.local.set({autoLogin: 0}, function() {
-      });
+      chrome.storage.local.set({
+        autoLogin: 1
+      }, function() {});
+    } else {
+      chrome.storage.local.set({
+        autoLogin: 0
+      }, function() {});
     }
   })
 
@@ -69,7 +70,10 @@ function init() {
         if (confirmed) {
           const arr = password.value.split(",");
           let pinVal = arr[0];
-          chrome.storage.local.set({username: username.value, pin: pinVal}, function() {
+          chrome.storage.local.set({
+            username: username.value,
+            pin: pinVal
+          }, function() {
 
             // localStorage.setItem("username", username.value);
             // localStorage.setItem("pin", pin.value);
@@ -123,8 +127,7 @@ function init() {
     if ((pinVal.length != 4) && (pinVal.length != 6)) {
       alert("Invalid password:\nPin must be **** or ******");
       return false;
-    }
-    else if (isNaN(pinVal)) {
+    } else if (isNaN(pinVal)) {
       alert("Invalid password:\nPin must only include numbers");
       return false;
     }
@@ -155,14 +158,14 @@ function enableForm() {
 function isAuto(cb) {
   chrome.storage.local.get(['autoLogin'], function(result) {
     if (!('autoLogin' in result)) {
-      chrome.storage.local.set({autoLogin: 0}, function() {
+      chrome.storage.local.set({
+        autoLogin: 0
+      }, function() {
         cb(false);
       });
-    }
-    else if (result.autoLogin == 0) {
+    } else if (result.autoLogin == 0) {
       cb(false);
-    }
-    else {
+    } else {
       cb(true);
     }
   });
@@ -190,6 +193,7 @@ function moveProgressBar(elem, num, tot) {
 function hide(el) {
   el.style.display = "none";
 }
+
 function show(el) {
   el.style.display = "block";
 }
@@ -208,8 +212,7 @@ function showDropDown() {
       show(setupDiv);
       show(setupInputDiv);
       enableForm();
-    }
-    else {
+    } else {
       console.log("set up");
       isAuto((stat) => {
         autoLoginToggle.checked = stat;
