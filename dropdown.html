@@ -7,9 +7,6 @@
 </head>
 
 <body>
-  <div id="loading">
-    <div class="loader"></div>
-  </div>
   <!-- <div id="options" style="display:none;">
     <h1>Options</h1>
     <label>Auto Login</label>
@@ -24,26 +21,18 @@
   <div id="body">
     <div id="setup" style="display:none;">
       <h1>Setup</h1>
-      <div id="setup-login-div">
-        <p>
-          1. First, log in to your purdue account (<a target="_blank" href="https://www.purdue.edu/apps/account/cas/login?service=https%3A%2F%2Fwl.mypurdue.purdue.edu">https://www.purdue.edu/apps/account/cas/login</a>).
-        </p>
-        <button class="request-button" id="check-login-status" type="submit">Check Status</button>
-      </div>
       <div id="setup-input-div">
         <p>
-          2. Input your username and pin to allow login
+          Enter your Purdue credentials
         </p>
 
         <form>
           <div class="input-form">
             <small>Username</small><br>
             <input class="input-field" type="text" placeholder="Username" name="username" id="username" /><br>
-            <small>BoilerKey Pin</small><br>
-            <input class="input-field" type="text" placeholder="****" name="pin" id="pin" /><br>
-            <small>New BoilerKey Device Name</small><br>
-            <input class="input-field" type="text" placeholder="Name" name="name" id="device-name" value="BoilerKey_Chrome" /><br><br>
-            <button class="submit-field" id="submit" type="submit" disabled>Generate BoilerKey</button>
+            <small>Password</small><br>
+            <input class="input-field" type="text" placeholder="****,push" name="password" id="password" /><br><br>
+            <button class="submit-field" id="submit" type="submit">Setup</button>
           </div>
         </form>
       </div>

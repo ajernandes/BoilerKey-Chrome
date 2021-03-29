@@ -2,8 +2,8 @@
   "name": "BoilerKey Auto Login - Chrome",
   "version": "0.0.1.0",
   "permissions": [
-    "storage",
     "cookies",
+    "storage",
     "https://api-1b9bef70.duosecurity.com/*",
     "https://www.purdue.edu/apps/account/cas/login"
   ],
