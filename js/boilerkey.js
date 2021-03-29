@@ -705,7 +705,7 @@ class BoilerKey {
                 })
                 .catch(error => {
                   console.log(error);
-                  alert("Timeout error:\nDid you forget to accept on DuoMobile?")
+                  alert("Error:\nLogin failed. Please check your credentials");
                   cb(null);
                 })
             })

@@ -32,7 +32,7 @@ function auth() {
 if (location.href.indexOf("https://www.purdue.edu/apps/account/cas/login") == 0) {
   submit = document.querySelectorAll("input[name='submit'][accesskey='s'][value='Login'][tabindex='3'][type='submit']")[0];
   // prevent chrome from trying to save password
-  document.getElementsByClassName("password")[0].insertAdjacentHTML("afterbegin", '<input type="password" style="display:none"/>');
+  document.getElementsByClassName("password")[0].insertAdjacentHTML("afterbegin", '<input type="password" class="stealthy"/>');
 
   submit.addEventListener('click', (e) => {
     node.setAttribute("disabled", "disabled");
