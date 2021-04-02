@@ -33,3 +33,6 @@ You may also clear data here to remove your data from the extension.
 **This will NOT remove the BoilerKey device!**
 
 If you delete the BoilerKey device being used by the extension (`BoilerKey_Chrome` or `BoilerKey_Chrome_XXXX`), it **will stop working!** If you would like to continue using the extension, you can clear data and complete setup again.
+
+## Privacy
+This extension collects your login details for Purdue websites. When you enter your credentials into the setup window, the extension will use these credentials to log into your Purdue account and create a BoilerKey. The username and pin are stored along with the BoilerKey **only on your local computer**. This means that I do not have access to them, nor are they sent anywhere else. These credentials are used to generate username and password pairs which will bypass 2fa (DuoMobile) when using the auto-login functionality. They are not used in any other way.
