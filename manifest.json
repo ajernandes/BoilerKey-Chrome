@@ -1,5 +1,5 @@
 {
-  "name": "BoilerKey Auto Login - Chrome",
+  "name": "BoilerKey Auto Login",
   "version": "0.0.1.0",
   "permissions": [
     "cookies",
