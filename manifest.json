@@ -7,7 +7,7 @@
     "https://api-1b9bef70.duosecurity.com/*",
     "https://www.purdue.edu/apps/account/cas/login"
   ],
-  "description": "Extension to automatically log in to your Purdue Acount",
+  "description": "Extension to automatically log in to your Purdue Account",
   "manifest_version": 2,
   "browser_action": {
     "default_title": "BoilerKey - In Browser",
