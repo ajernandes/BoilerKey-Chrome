@@ -2,13 +2,10 @@
 
 A chrome extension to log in for you using your Purdue account without having to confirm with DuoMobile, forked from <a href="https://github.com/jeremywgleeson/BoilerKey-Chrome">https://github.com/jeremywgleeson/BoilerKey-Chrome</a> 
 
+A button is added below the normal 'Login' button on the Purdue sign in page. This will automatically autofill a one-time-password generated from your BoilerKey and sign in for you!
 
 ## Install unpacked extensions
 Look through the guide <a href="https://developer.chrome.com/docs/extensions/mv3/getstarted/">here</a>
-
-<img src="https://imgur.com/Ztea55n.png" width="800">
-
-A button is added below the normal 'Login' button on the Purdue sign in page. This will automatically autofill a one-time-password generated from your BoilerKey and sign in for you!
 
 ## Setup
 **This setup will create a new BoilerKey Device for you!**
