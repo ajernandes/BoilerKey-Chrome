@@ -1,10 +1,6 @@
 # BoilerKey - Chrome
 
-Chrome webstore: https://chrome.google.com/webstore/detail/boilerkey-auto-login/bjnbjiibppganlfgnngnofmaihokggem
-
-Firefox webstore: https://addons.mozilla.org/en-US/firefox/addon/boilerkey-auto-login/
-
-A chrome extension to log in for you using your Purdue account without having to confirm with DuoMobile.
+A chrome extension to log in for you using your Purdue account without having to confirm with DuoMobile, forked from <a href="https://github.com/jeremywgleeson/BoilerKey-Chrome">https://github.com/jeremywgleeson/BoilerKey-Chrome</a> 
 
 
 <img src="https://imgur.com/Ztea55n.png" width="800">
