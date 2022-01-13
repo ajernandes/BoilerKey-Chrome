@@ -928,7 +928,7 @@ class BoilerKey {
     chrome.storage.local.get(['hotpCounter'], function(result) {
       var count;
       if ('hotpCounter' in result) {
-        count = parseInt(result.hotpCounter) + 1;
+        count = parseInt(result.hotpCounter);
       } else {
         count = 1;
       }
