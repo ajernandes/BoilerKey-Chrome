@@ -30,6 +30,12 @@
   {
     "matches": ["https://purdue.brightspace.com/d2l/login*", "https://www.purdue.edu/apps/account/cas/login*brightspace*"],
     "js": ["js/brightspace.js"]
+  },
+  {
+    "matches": ["https://dining.purdue.edu/menus*"],
+    "css": [
+      "menus.css"
+    ]
   }
 ],
   "icons": {
