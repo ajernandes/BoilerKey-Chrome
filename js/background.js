@@ -7,7 +7,7 @@
 //     // read changeInfo data and do something with it (like read the url)
 //     if (changeInfo.url) {
 //       console.log(changeInfo.url);
-//       if (changeInfo.url.indexOf("https://www.purdue.edu/apps/account/cas/login") == 0) {
+//       if (changeInfo.url.indexOf("https://sso.purdue.edu/idp/profile/SAML2/POST/SSO") == 0) {
 //         BoilerKey.login((status) => {
 //           console.log("Background login completed with status: " + status);
 //           if (status) {

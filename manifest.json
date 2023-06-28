@@ -7,7 +7,7 @@
   ],
   "host_permissions": [
     "https://api-1b9bef70.duosecurity.com/*",
-    "https://www.purdue.edu/apps/account/cas/login*"
+    "https://sso.purdue.edu/idp/profile/SAML2/POST/SSO*"
   ],
   "description": "Improves aspects of using Purdue systems. Includes auto-login, CSS tweaks, and other small changes",
   "manifest_version": 3,
@@ -16,7 +16,7 @@
   },
   "content_scripts": [
   {
-    "matches": ["https://www.purdue.edu/apps/account/cas/login*"],
+    "matches": ["https://sso.purdue.edu/idp/profile/SAML2/POST/SSO*"],
     "css": [
       "login.css"
     ],
@@ -28,7 +28,7 @@
     ]
   },
   {
-    "matches": ["https://purdue.brightspace.com/d2l/login*", "https://www.purdue.edu/apps/account/cas/login*brightspace*"],
+    "matches": ["https://purdue.brightspace.com/d2l/login*", "https://sso.purdue.edu/idp/profile/SAML2/POST/SSO*brightspace*"],
     "js": ["js/brightspace.js"]
   },
   {

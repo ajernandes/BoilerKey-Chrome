@@ -257,7 +257,7 @@ class BoilerKey {
       }
 
       chrome.cookies.remove({
-          url: 'https://www.purdue.edu/apps/account/cas/login',
+          url: 'https://sso.purdue.edu/idp/profile/SAML2/POST/SSO',
           name: 'JSESSIONID'
         },
         (cookie) => {
@@ -722,14 +722,14 @@ class BoilerKey {
       "User-Agent": "okhttp/3.11.0"
     }
     chrome.cookies.remove({
-        url: 'https://www.purdue.edu/apps/account/cas/login',
+        url: 'https://sso.purdue.edu/idp/profile/SAML2/POST/SSO',
         name: 'JSESSIONID'
       },
       (cookie) => {
         if (!cookie) {
           console.log('Can\'t remove cookie!');
         }
-        fetch("https://www.purdue.edu/apps/account/cas/login?service=https%3A%2F%2Fwl.mypurdue.purdue.edu", {
+        fetch("https://sso.purdue.edu/idp/profile/SAML2/POST/SSO?service=https%3A%2F%2Fwl.mypurdue.purdue.edu", {
             method: "GET",
             headers: headers
           })
@@ -802,7 +802,7 @@ class BoilerKey {
       "User-Agent": "okhttp/3.11.0"
     }
 
-    fetch("https://www.purdue.edu/apps/account/cas/login?service=https%3A%2F%2Fwl.mypurdue.purdue.edu", {
+    fetch("https://sso.purdue.edu/idp/profile/SAML2/POST/SSO?service=https%3A%2F%2Fwl.mypurdue.purdue.edu", {
         method: "GET",
         headers: headers,
         redirect: "manual",
